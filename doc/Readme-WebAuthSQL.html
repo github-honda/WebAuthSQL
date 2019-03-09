@@ -1,0 +1,303 @@
+<!-- 
+20190308, Honda, Readme-WebAuthSQL.html. 
+-->
+
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+<!-- Global site tag (gtag.js) - Google Analytics - svc.011.idv.tw -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-125026365-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-125026365-2');
+</script>
+
+	<title>Implements ASP.NET Identity with SQL Scripts.</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+	
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+	
+    <style type="text/css">
+        body {
+            font-family: "DFKai-sb","MingLiU","Microsoft JhengHei";
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+<h3>Implements ASP.NET Identity with SQL Scripts</h3>
+	<button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-target="#navbarSupportedContent" data-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="navbarSupportedContent" class="collapse navbar-collapse">
+<ul class="navbar-nav mr-auto">
+	<li class="nav-item">&nbsp;</li>
+</ul>
+<div class="text-right">
+<a href="http://www.011.idv.tw">011</a>
+</div>
+        </div>
+    </nav>
+
+
+<div class="container-fluid">
+
+        <div>
+            <span>From:</span>
+            <span>hondachen@hotmail.com</span>
+        </div>
+        <div>
+            <span>Date:</span>
+            <span>2019-03-08</span>
+        </div>
+
+        <div>
+            <span>Subject:</span>
+            <span>以 SQL 語法實作 ASP.NET Identity</span>
+        </div>
+        <br />
+本文介紹以 SQL 語法的方式 實作 ASP.NET Identity, 在 Visual studio 2015 建立的網站預設樣本中(template=Web Forms, Authentication=Indivisual User Account), 替換掉 EntityFramework Code first .
+<br />
+
+<br />
+目錄:
+<ol>
+	<li><a href="#1">建立網站 WebAuthSQL</a></li>
+	<li><a href="#2">解除安裝 Microsoft.AspNet.Identity.EntityFramework 元件</a></li>
+	<li><a href="#3">移除參考 EntityFramework 及 EntityFramework.SQLServer</a></li>
+	<li><a href="#4">加入以 SQL 語法製作的 ASP.NET Identity 自訂元件</a></li>
+	<li><a href="#5">將 EntityFramework 改為使用 LibSQL.DIdentity</a></li>
+	<li><a href="#6">將 ApplicationUser 改為繼承 LibSQL.DIdentity.User., ApplicationDbContext 改為繼承 ZLib.DLib.ZSqlClient</a></li>
+	<li><a href="#7">將 ApplicationUserManager 類別需要的資料庫改為由 ZLib.DLib.ZSqlClient 提供</a></li>
+	<li><a href="#8">將 ConnnectionString 改到新的資料庫位置</a></li>
+	<li><a href="#9">建立新ASP.NET Identity身分認證資料庫, 移除舊資料庫</a></li>
+	<li><a href="#10">編譯執行測試</a></li>
+</ol>
+範例程式可自<a href="https://github.com/github-honda/VS2015TemplateOriginal">VS2015TemplateOriginal</a>取得.
+<br />
+
+
+<br />
+以 Visual studio 2015 template 建立的的 ASP.NET 網站專案, 預設會採用 EntityFramework Code first 方式實作 ASP.NET Identity, 常見問題如下:
+<ol>
+	<li>開發者必須熟悉並依循 EntityFramework Code First 的運作方式(例如: Migrations ), 以程式碼為中心, 才能應付資料庫的擴充需求.</li>
+	<li>若正式環境資料庫受管制, 不可變更資料庫結構, 則必須採用其他方法替代 EntityFramework Code First 變動資料庫結構的程序.</li>
+	<li>團隊成員不熟悉 EntityFramework Code First + LINQ: 原本熟悉 SQL 的開發團隊可以輕易解決的問題, 改用 EntityFramework Code First + LINQ後, 難以寫出複雜邏輯、或程式執行結果非預期、效能差, 需付出更多的專案資源才能完成,  原本熟悉SQL的其他成員(PM、SQ、SD、DBA、User...等), 也無法再經由 SQL 描述的開發文件, 協助檢驗原始碼, 確認符合需求定義或維護資料庫.
+	</li>
+</ol>
+每一種技術都有其獨特性, 必需透過熟練的人員運用在適當的場合, 才會事半功倍!  
+<br />
+<br />
+實務上能熟悉 EntityFramework Code First 的開發人員就是不多. 大多數的人都熟悉 SQL 不忘, 就是不熟悉 EntityFramework Code First. 因此最直覺的解決方案, 還是捨棄 EntityFramework Code First, 改用傳統的 SQL 方式就好, 讓原本熟悉 SQL 的人才, 繼續貢獻原有的專長. 
+<br />
+<br />
+
+依照本文內容修改以後, 就可以在專案中查詢 SQL 關鍵字, 很快查到結果如下: 
+<br />
+<img src="FindInsert.jpg" class="img-fluid" alt="Insert">
+其他的查詢例:
+<a href="FindUpdate.jpg">Update</a>,
+<a href="FindDelete.jpg">Delete</a>,
+<a href="FindSelect.jpg">Select</a>.
+<br />
+<br />
+
+
+步驟:
+<ol>
+	<li><a name="1">建立網站專案 WebAuthSQL</a>
+<br />
+	參考<a href="http://svc.011.idv.tw/CodeHelper/cs/vs2015/IDEOriginal/WebAuth1/doc/Readme-WebAuth1.html">如何建立</a>自行從Visual studio 2015建立WebAuth1專案, 或是直接從<a href="https://github.com/github-honda/VS2015TemplateOriginal">已完成的樣本</a>取得WebAuth1專案.
+<br />
+	將WebAuth1專案編譯完成, 並且測試成功後, 再把 Solution 及 Project 名稱都改為 WebAuthSQL. 作為本文要修改的 Solution 及 Project. 
+	</li>
+
+<br />
+	
+	<li><a name="2">解除安裝 Microsoft.AspNet.Identity.EntityFramework 元件</a>
+<br />
+<img src="0010-UninstallEntityFramework1.jpg" class="img-fluid" alt="">
+<br />
+<br />
+<img src="0010-UninstallEntityFramework2.jpg" class="img-fluid" alt="">
+	</li>
+<br />
+
+	<li><a name="3">移除參考 EntityFramework 及 EntityFramework.SQLServer</a>
+<br />
+<img src="0020-RemoveReference.jpg" class="img-fluid" alt="">
+	</li>
+<br />
+
+	<li><a name="4">加入自訂的 ASP.NET Identity 實作程式</a>
+
+<br />
+ASP.NET EntityFramework + Identity 實際上是由以下這些元件組成:
+<br />
+ Microsoft.AspNet.Identity.EntityFramework
+<br />
+ EntityFramework
+<br />
+ EntityFramework.SQLServer
+<br />
+移除這些元件以後, 就必須提供相同的功能補上. 
+
+<br />
+<br />
+本文提供兩個程式庫專案補齊:
+<br />
+1. ZLib: 存取 SQL Server 資料庫公用函數. (也可用於 MSSQLLocalDB 或 SQL Express 資料庫)
+<br />
+2. LibSQL: 存取<a href="#ERD of ASP.NET Identity">ASP.NET Identity身分認證資料庫</a>程式.
+<br />
+請將這兩個專案, 加入 WebAuthSQL Solution 中並參考引.
+	
+
+<br />
+<br />
+<a name="ERD of ASP.NET Identity">ASP.NET Identity身分認證資料庫</a>
+<img src="020040-ERD-Original.jpg" class="img-fluid" alt="ERD of ASP.NET Identity">
+<br />
+
+
+<br />
+ASP.NET EntityFramework + Identity 需要實作的內容相當多, 不是本文能涵蓋說明的範圍. 
+<br />
+原本這些程式被封裝在移除的元件中, 好處是不用寫一行程式碼, 也不用管這些程式長在哪裡, 就可以立即享用. 
+<br />
+好處也是缺點:  當你想要加點變化, 加上一行程式碼的時候, 就不容易找到這些被隱藏封裝的資訊, 必須在充分了解架構以後, 才能找到正確的控制點.
+<br />
+
+
+<br />
+以UserStore介面為例, 就必須提供下圖這一堆介面. 如果是用不到的功能, 當然可以不用傻傻的實作每個介面, 省一點功夫:
+<br />
+<img src="UserStore.jpg" class="img-fluid" alt="">
+
+
+<br />
+<br />
+Code First 比較嚴格, 會多寫一些對<a href="#ERD of ASP.NET Identity">目標資料庫</a>檢驗或驅動修改資料庫結構的程式, 以確保資料庫結構與程式碼相容.
+<br />
+相對的, DB First 開發模式比較寬鬆, 多半不會有檢驗或驅動修改資料庫結構的程式, 通常只檢驗程式與資料庫版本編號而已.
+<br />
+新建資料庫時, Code First 模式比較方便, 不需要另外人工執行建立資料庫的工作.
+<br />
+需要資料庫擴充時, 不管是Code First 還是 DB First 都很複雜. 尤其是 Code First 更是複雜. 因為如果還是要靠程式碼為中心, 堅持在程式執行時, 才變更資料庫結構的話, 要考慮的因素就更多! 
+<br />
+<br />
+
+
+不管是Code First 還是 DB First的模式, 當<a href="#ERD of ASP.NET Identity">資料庫結構定義</a>改變時, 都必須調整對應的的程式. 差別的是, Code first 最好是依循 EntityFramework 的框架修改; DB first 則應調整(SQL 指令對應的程式碼. 如下圖 RoleTable.cs, UserClaimsTable.cs, UserLoginsTable.cs, UserRolesTable.cs, UserTable.cs 都包含了以 SQL 指令實作的新增、修改、刪除與查詢函數:
+<br />
+<img src="DIdentity.jpg" class="img-fluid" alt="">
+
+<br />
+<br />
+以 UserTable.cs.GetUserById()為例, 是網站 ASP.NET Identity 取得資料庫 table=AspNetUsers 一筆資料的方法. 隱藏在預設元件中:
+<br />
+<img src="UserTable.jpg" class="img-fluid" alt="">
+<br />
+引用這兩個程式庫專案, 當你需要修改或擴充的時候, 只要在專案中搜尋 SQL 指令, 就可以找到需要修改的位置.
+<br />
+你也可以把這兩個程式庫專案, 當作黑箱或是以.dll的方式使用就好, 效果等於不用多寫一行程式碼. 
+如果你完全沒有修改或擴充 Identity 架構的需求, 建議沿用原來預設建立的專案樣本就好, 不用改成 SQL.
+你也可以評估 把(LibSQL)跟(網站WebAuthSQL)兩個專案合併為一個網站專案, 不用隔離(資料處理)跟(Application).
+<br />
+<br />
+
+接下來, 必須把網站專案 WebAuthSQL, 改為使用 ZLib 跟 LibSQL:
+<br />
+ 
+	</li>
+
+
+	<li><a name="5">將 EntityFramework 改為使用 LibSQL.DIdentity</a>
+<br />
+	將專案 WebAuthSQL 中, 所有的 using Microsoft.AspNet.Identity.EntityFramework; 的.cs 程式, 都改成 using LibSQL.DIdentity;
+<br />
+   需要修改的程式清單如下:
+<br />
+     App_Start\IdentityConfig.cs
+<br />
+     App_Start\Startup.Auth.cs
+<br />
+     Models\IdentityModel.cs
+<br />
+     Account\Manage.aspx.cs
+<br />
+	</li>
+<br />
+
+	<li><a name="6">將 ApplicationUser 改為繼承 LibSQL.DIdentity.User., ApplicationDbContext 改為繼承 ZLib.DLib.ZSqlClient</a>
+<br />
+     將專案 WebAuthSQL 的 Models\IdentityModel.cs ApplicationUser 類別改為繼承 LibSQL.DIdentity.User., ApplicationDbContext 類別改為繼承 ZLib.DLib.ZSqlClient, 並傳入ConnectionString
+<br />
+<img src="0220-IdentityModel.jpg" class="img-fluid" alt="">
+<br />
+	</li>
+<br />
+  
+
+	<li><a name="7">將 ApplicationUserManager 類別需要的資料庫改為由 ZLib.DLib.ZSqlClient 提供</a>
+<br />
+     將專案 WebAuthSQL 的 App_Start\IdentityConfig.cs ApplicationUserManager 類別需要的資料庫改為由 ZLib.DLib.ZSqlClient 提供
+<br />
+<img src="0230-IdentifyConfig.jpg" class="img-fluid" alt="">
+<br />
+	</li>
+<br />
+  
+
+	<li><a name="8">將 ConnnectionString 改到新的資料庫位置</a>
+<br />
+	將專案 WebAuthSQL 中 的 Web.config, 改成你的新資料庫位置, 如以下參考:
+<br />
+    &lt;add name="DefaultConnection" connectionString="Data Source=127.0.01;Initial Catalog=DBAspNet1;Integrated Security=True" providerName="System.Data.SqlClient" /&gt;
+<br />
+
+   原為:	
+<br />
+    &lt;add name="DefaultConnection" connectionString="Data Source=(LocalDb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\aspnet-WebBase1Auth-20180924123716.mdf;Initial Catalog=aspnet-WebBase1Auth-20180924123716;Integrated Security=True" providerName="System.Data.SqlClient" /&gt;
+<br />
+	</li>
+<br />
+
+	<li><a name="9">建立新資料庫, 移除舊資料庫</a>
+<br />
+  參考 <a href="CreateDBAspNet1-SqlServer.sql">CreateDBAspNet1-SqlServer.sql</a>
+ 建立 SQL Server 新資料庫 DBAspNet1
+<br />
+  移除在 App_Data 目錄下的舊資料庫 MSSQLLocalDB:
+<br />
+    App_Data\*.MDF
+<br />
+    App_Data\*.LDF
+<br />
+	</li>
+<br />
+
+
+	<li><a name="10">編譯執行測試</a>
+	</li>
+<br />
+
+</ol>
+
+
+<div class="text-right">
+<a href="/CodeHelper/cs/index.html">C# CodeHelper</a> |
+<a href="http://www.011.idv.tw">011</a>
+</div>
+
+</div>
+</body>
+
+</html>

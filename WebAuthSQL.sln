@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAuthSQL", "WebAuth1\WebAuthSQL.csproj", "{A971FC5C-CD3B-4212-8AF1-60E1718DF469}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZLib", "ZLib\ZLib.csproj", "{B1B97AEE-CEC0-451D-A01A-282AFD9E08E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibSQL", "LibSQL\LibSQL.csproj", "{AB41C5F6-388C-4188-BFC1-396B4691248F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A971FC5C-CD3B-4212-8AF1-60E1718DF469}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A971FC5C-CD3B-4212-8AF1-60E1718DF469}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A971FC5C-CD3B-4212-8AF1-60E1718DF469}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A971FC5C-CD3B-4212-8AF1-60E1718DF469}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1B97AEE-CEC0-451D-A01A-282AFD9E08E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1B97AEE-CEC0-451D-A01A-282AFD9E08E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1B97AEE-CEC0-451D-A01A-282AFD9E08E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1B97AEE-CEC0-451D-A01A-282AFD9E08E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB41C5F6-388C-4188-BFC1-396B4691248F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB41C5F6-388C-4188-BFC1-396B4691248F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB41C5F6-388C-4188-BFC1-396B4691248F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB41C5F6-388C-4188-BFC1-396B4691248F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
