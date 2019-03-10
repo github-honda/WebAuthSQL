@@ -63,7 +63,7 @@
             <span>以 SQL 實作 ASP.NET Identity</span>
         </div>
         <br />
-本文介紹以 SQL 語法的方式 實作 ASP.NET Identity, 在 Visual studio 2015 建立的網站預設樣本中(template=Web Forms, Authentication=Indivisual User Account), 替換掉 EntityFramework Code first .
+本文介紹以 SQL 語法的方式 實作 ASP.NET Identity, 替換掉 EntityFramework Code first .
 <br />
 
 <br />
@@ -85,11 +85,11 @@
 
 
 <br />
-以 Visual studio 2015 template 建立的的 ASP.NET 網站專案, 預設會採用 EntityFramework Code first 方式實作 ASP.NET Identity, 常見問題如下:
+以 Visual studio 2015 template 建立的的 ASP.NET 網站(template=Web Forms, Authentication=Indivisual User Account), 預設會採用 EntityFramework Code first 方式實作 ASP.NET Identity. 常見問題如下:
 <ol>
 	<li>開發者必須熟悉並依循 EntityFramework Code First 的運作方式(例如: Migrations ), 以程式碼為中心, 才能應付資料庫的擴充需求.</li>
-	<li>若正式環境資料庫受管制, 不可變更資料庫結構, 則必須採用其他方法替代 EntityFramework Code First 變動資料庫結構的程序.</li>
-	<li>團隊成員不熟悉 EntityFramework Code First + LINQ: 原本熟悉 SQL 的開發團隊可以輕易解決的問題, 改用 EntityFramework Code First + LINQ後, 難以寫出複雜邏輯、或程式執行結果非預期、效能差, 需付出更多的專案資源才能完成,  原本熟悉SQL的其他成員(PM、SQ、SD、DBA、User...等), 也無法再經由 SQL 描述的開發文件, 協助檢驗原始碼, 確認符合需求定義或維護資料庫.
+	<li>若正式環境資料庫受管制, 不可變更資料庫結構, 則必須尋求其他方法, 替代 EntityFramework Code First 以程式碼方式, 變動資料庫結構的程序.</li>
+	<li>團隊成員不熟悉 EntityFramework Code First + LINQ: 原本熟悉 SQL 的開發團隊可以輕易解決的問題, 改用 EntityFramework Code First + LINQ後, 難以寫出複雜邏輯、或程式執行結果非預期、效能差, 需付出更多的專案資源才能完成,  原本熟悉SQL的其他成員(PM、SQ、SD、DBA、User...等), 更不可能熟悉 EntityFramework Code First + LINQ 程式碼, 無法再透過 SQL 描述的開發文件協助確認符合需求、或是檢驗原始碼以及維護資料庫.
 	</li>
 </ol>
 每一種技術都有其獨特性, 必需透過熟練的人員運用在適當的場合, 才會事半功倍!  
